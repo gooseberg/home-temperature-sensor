@@ -20,17 +20,22 @@ class App extends Component {
   }
   toggleOn = (e) => {
     console.log('toggling on', this, e);
-    this.postToggle({toggle: true});
+    this.postToggle({action: 'callFunction', name: 'led', argument: '1'});
   }
   toggleOff = (e) => {
     console.log('toggling on', this, e);
-    this.postToggle({toggle: false});
+    this.postToggle({action: 'callFunction', name:'led', argument: '0'});
+  }
+  getPin = (e) => {
+    console.log('getting pin', this, e);
+    this.postToggle({action: 'getVariable', name: 'pin'})
   }
   render() {
     return (
       <div>
         <button onClick={this.toggleOn}> Toggle On </button>
         <button onClick={this.toggleOff}> Toggle Off </button>
+        <button onClick={this.getPin}>Get Pin</button>
       </div>
     );
   }
