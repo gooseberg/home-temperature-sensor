@@ -3,24 +3,22 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  postToggle(options) {
+    
+  }
+  toggleOn = (e) => {
+    console.log('toggling on', this, e);
+    this.postToggle({toggle:true});
+  }
+  toggleOff = (e) => {
+    console.log('toggling on', this, e);
+    this.postToggle({toggle:true});
+  }
   render() {
-    fetch('/toggle').then((resp) => {console.log(resp)});
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <button onClick={this.toggleOn}> Toggle On </button>
+        <button onClick={this.toggleOff}> Toggle Off </button>
       </div>
     );
   }

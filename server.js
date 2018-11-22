@@ -18,26 +18,26 @@ app.get('/', function (req, res) {
 });
 
 app.listen(port, () => {
-	console.log('Server running at http://' + hostname + ':' + port + '//');
+	console.log(`Server running at http://localhost:${port}`);
 });
 
-app.post('/login', function (req, res) {
-	var userName = req.body.user;
-	var password = req.body.password;
-	if (userName == 'admin' && password == 'default') {
-		console.log("Attempting to log in with default user pass");
-		userName = 'robismor@gmail.com';
-		password = Buffer.from('ZWxkZWxyb2JzdGVy', 'base64').toString("ascii");
-	}
-	particle.login({ username: userName, password: password }).then(
-		function (data) {
-			token = data.body.access_token;
-			console.log('Logged in successfully.');
-		},
-		function (err) {
-			console.log('Could not log in.', err.body);
-		});
-});
+// app.post('/login', function (req, res) {
+// 	var userName = req.body.user;
+// 	var password = req.body.password;
+// 	if (userName == 'admin' && password == 'default') {
+// 		console.log("Attempting to log in with default user pass");
+// 		userName = 'robismor@gmail.com';
+// 		password = Buffer.from('ZWxkZWxyb2JzdGVy', 'base64').toString("ascii");
+// 	}
+// 	particle.login({ username: userName, password: password }).then(
+// 		function (data) {
+// 			token = data.body.access_token;
+// 			console.log('Logged in successfully.');
+// 		},
+// 		function (err) {
+// 			console.log('Could not log in.', err.body);
+// 		});
+// });
 app.get('/toggle', function (req, res) {
 	console.log('recieved get req');
 	res.send('It worked');
