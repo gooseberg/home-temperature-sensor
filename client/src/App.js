@@ -27,18 +27,16 @@ class App extends Component {
     this.postRequest({action: 'callFunction', name:'led', argument: '0'});
   }
   getTemp = (e) => {
-    console.log('getting temp', this, e);
     this.postRequest({action: 'getVariable', name: 'temp'})
       .then((resp) => {
         resp.json()
             .then(json => {
-              console.log(json);
               this.setState({temp: this.convertTemp(json.value)});
             })
         });
   }
   convertTemp(temp) {
-    return Math.floor(temp/1000);
+    return temp/1000;
   }
   render() {
     return (
