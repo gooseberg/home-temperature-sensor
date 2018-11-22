@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const Particle = require('particle-api-js');
 const path = require('path');
+require('dotenv').config();
 
 const hostname = '192.168.11.8';
 const port = process.env.PORT || 8000;
@@ -14,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
+	console.warn(`particle key`, process.env.)
 	res.sendFile(`${__dirname}/index.html`);
 });
 
