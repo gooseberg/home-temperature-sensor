@@ -6,21 +6,20 @@ const Particle = require('particle-api-js');
 const path = require('path');
 require('dotenv').config();
 
-const hostname = '192.168.11.8';
 const port = process.env.PORT || 8000;
 var particle = new Particle();
 var token;
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.get('/', function (req, res) {
-	console.warn(`particle key`, process.env.)
 	res.sendFile(`${__dirname}/index.html`);
 });
 
 app.listen(port, () => {
 	console.log(`Server running at http://localhost:${port}`);
+
 });
 
 // app.post('/login', function (req, res) {
@@ -40,12 +39,12 @@ app.listen(port, () => {
 // 			console.log('Could not log in.', err.body);
 // 		});
 // });
-app.get('/toggle', function (req, res) {
+app.get('/api', function (req, res) {
 	console.log('recieved get req');
 	res.send('It worked');
 });
 
-app.post('/toggle', function (req, res) {
-	console.log('recieved post req');
+app.post('/api', function (req, res) {
+	console.log('recieved post req', req.body);
 	res.send('It worked');
 });

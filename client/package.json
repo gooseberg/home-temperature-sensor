@@ -1,5 +1,5 @@
 {
-  "name": "temperature-sensor2",
+  "name": "temperature-sensor",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
