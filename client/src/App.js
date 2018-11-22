@@ -13,29 +13,40 @@ class App extends Component {
       }
     }
   }
-  postToggle(data) {
+  postRequest(data) {
     let init = this.postInit(data);
     const URL = '/api';
-    fetch(URL, init).then(resp => console.log(resp));
+    return fetch(URL, init);
   }
   toggleOn = (e) => {
     console.log('toggling on', this, e);
-    this.postToggle({action: 'callFunction', name: 'led', argument: '1'});
+    this.postRequest({action: 'callFunction', name: 'led', argument: '1'});
   }
   toggleOff = (e) => {
     console.log('toggling on', this, e);
-    this.postToggle({action: 'callFunction', name:'led', argument: '0'});
+    this.postRequest({action: 'callFunction', name:'led', argument: '0'});
   }
-  getPin = (e) => {
-    console.log('getting pin', this, e);
-    this.postToggle({action: 'getVariable', name: 'pin'})
+  getTemp = (e) => {
+    console.log('getting temp', this, e);
+    this.postRequest({action: 'getVariable', name: 'temp'})
+      .then((resp) => {
+        resp.json()
+            .then(json => {
+              console.log(json);
+              this.setState({temp: this.convertTemp(json.value)});
+            })
+        });
+  }
+  convertTemp(temp) {
+    return Math.floor(temp/1000);
   }
   render() {
     return (
       <div>
         <button onClick={this.toggleOn}> Toggle On </button>
         <button onClick={this.toggleOff}> Toggle Off </button>
-        <button onClick={this.getPin}>Get Pin</button>
+        <button onClick={this.getTemp}>Get Temp</button>
+        <h1>{this.state ? `${this.state.temp} deg c` : 'No Data'}</h1>
       </div>
     );
   }
