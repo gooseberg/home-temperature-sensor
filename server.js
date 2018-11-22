@@ -22,43 +22,43 @@ app.listen(port, () => {
 
 });
 
-// app.post('/login', function (req, res) {
-// 	var userName = req.body.user;
-// 	var password = req.body.password;
-// 	if (userName == 'admin' && password == 'default') {
-// 		console.log("Attempting to log in with default user pass");
-// 		userName = 'robismor@gmail.com';
-// 		password = Buffer.from('ZWxkZWxyb2JzdGVy', 'base64').toString("ascii");
-// 	}
-// 	particle.login({ username: userName, password: password }).then(
-// 		function (data) {
-// 			token = data.body.access_token;
-// 			console.log('Logged in successfully.');
-// 		},
-// 		function (err) {
-// 			console.log('Could not log in.', err.body);
-// 		});
-// });
 app.get('/api', function (req, res) {
 	console.log('recieved get req');
 	res.send('It worked');
 });
 
-app.post('/api', function (req, res) {
-	console.log('recieved post req', req.body);
-	let token = process.env.PARTICLE_TOKEN
-	let devicesReq = particle.listDevices({auth: token});
-	devicesReq.then(devices => {
-		console.log(devices.body[0]);
-		let reece = devices.body[0];
-		let id = reece.id;
-		particle.callFunction({
-			deviceId: id,
-			name: 'led',
-			argument: '1',
-			auth: token,
-		})
-		console.log(id);
+app.post('/api', (req, res) => {
+	console.log('recieved post req2', req.body);
+	let action = req.body.action;
+	postRequest(req, particleRequest).then(resp => {
+		handleParticleResp(resp, action, res);
 	});
-	res.send('It worked');
 });
+
+const handleParticleResp = (resp, type, res) => {
+	console.log('resp', resp, type);
+	let out = {value: resp.body.result, success: true};
+	res.send(JSON.stringify(out));
+}
+
+const requestLookup = {
+	'getVariable': particle.getVariable.bind(particle),
+	'callFunction': particle.callFunction.bind(particle),
+}
+
+const particleRequest = (body, options) => {
+	let id = process.env.RAUTEK_1;
+	let token = process.env.PARTICLE_TOKEN;
+	let func = requestLookup[body.action] || null;
+	let baseOptions = { auth: token, deviceId: id, name: body.name };
+	let finalOptions = Object.assign({}, options, baseOptions);
+	return func(finalOptions);
+};
+
+const postRequest = (req, callback, options = {}) => {
+	let body = req.body;
+	if (body.argument) {
+		options.argument = body.argument;
+	}
+	return callback(body, options);
+}
