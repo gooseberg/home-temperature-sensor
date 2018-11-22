@@ -46,5 +46,19 @@ app.get('/api', function (req, res) {
 
 app.post('/api', function (req, res) {
 	console.log('recieved post req', req.body);
+	let token = process.env.PARTICLE_TOKEN
+	let devicesReq = particle.listDevices({auth: token});
+	devicesReq.then(devices => {
+		console.log(devices.body[0]);
+		let reece = devices.body[0];
+		let id = reece.id;
+		particle.callFunction({
+			deviceId: id,
+			name: 'led',
+			argument: '1',
+			auth: token,
+		})
+		console.log(id);
+	});
 	res.send('It worked');
 });
