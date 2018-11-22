@@ -1,0 +1,41 @@
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+	<script>
+		var URL = "http://192.168.11.6:8000/";
+		$(document).ready(function(){
+			$("#submit").click(function(){
+				console.log("Attempting Login " + URL + "login");
+				var user = $("#user").val();
+				var pass = $("#password").val();
+				if(user == "" || pass == ""){
+					alert("Please enter a username and password");
+				} else {
+					$.post(URL + "login", {user: user, password: pass}, function(data){
+						console.log(data);
+					});
+				}
+			});
+			$("#on").click(function(){
+				console.log("sending on command");
+				$.post(URL + "toggle", {func: "ledON"}, function(data){
+					console.log("post sent");
+				});
+			});
+			$("#off").click(function(){
+				console.log("sending off command");
+				$.post(URL + "toggle", {func: "ledOFF"}, function(data){
+					console.log("post sent");
+				});
+			});
+		});
+	</script>
+</head>
+<body>
+	Username:<input type="text" id="user" size="40"><br>
+	Password:<input type="password" id="password" size="40"><br>
+	<button id="submit">Log In</button><br><br>
+	<button id="on">TURN LED ON AUGH</button>
+	<button id="off">ASDF TURN LED OFF</button>
+</body>
+</html>
