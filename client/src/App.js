@@ -1,53 +1,60 @@
 import React, { Component } from 'react';
 import './App.css';
+const convertTemp = (temp) => {
+  return temp/1000;
+}
 const DeviceCard = (props, key) => {
+  console.log('props in device card', props);
   return (
     <div key={key}>
       <h3>{props.name}</h3>
       <p>Status {props.status}</p>
       <p>Connected? {props.connected ? 'yes' : false}</p>
+      <p>Temperature: {convertTemp(props.temperature) || 'Loading...'}</p>
     </div>
   );
 }
-class App extends Component {
-  constructor(props){
+class Devices extends Component {
+  constructor(props) {
     super(props);
-      this.getRequest('/devices/')
-          .then(resp => resp
-            .json()
-            .then(json => {
-              console.log(json);
-              this.setState({
-                devices: json.data.map((device, index) => DeviceCard(device, index))
-              })
-            })
-          );
+    this.state = {devices: []};
+    this.getDevices()
+        .then(resp => resp.json()
+        .then(json => {
+          console.log(json);
+          this.setState({devices: json.data});
+        }));
   }
-  postInit(data) {
-    return {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*',
-      }
-    }
+  render() {
+    console.log(this.state);
+    return (
+      <div>
+        {
+          this.state.devices.map(device => (
+          <DeviceCard name={device.name} status={device.status} 
+            connected={device.connected} temperature={device.temperature}>
+          </DeviceCard>))
+        }
+      </div>
+    );
   }
-  getRequest(reqUrl, params = {}, base = window.location) {
+  getDevices() {
+    return this.getRequest('/devices/');
+  }
+  async getRequest(reqUrl, params = {}, base = window.location) {
     let url = new URL(reqUrl, base);
     let urlSearchParams = new URLSearchParams();
     Object.keys(params).forEach(key => urlSearchParams.append(key, params[key]));
     url.search = urlSearchParams.toString();
     return fetch(url.toString());
   }
-  convertTemp(temp) {
-    return temp/1000;
-  }
+}
+class App extends Component {
   render() {
     return (
       <div>
         <h1>House Devices</h1>
-        {this.state ? this.state.devices : null};
+        <Devices></Devices>
       </div>
     );
   }
