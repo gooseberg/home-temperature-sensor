@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import { throws } from 'assert';
 const formatTemp = (temp) => {
   return temp ? `${temp/1000} °C` : null;
 }
@@ -43,12 +42,10 @@ class Devices extends Component {
     devices.forEach(device => this.getTemp(device));
   }
   getTemp(device) {
-    console.log('getting temp for', device);
     const DEVICE_ID = device.id
     this.getRequest(`/device/${DEVICE_ID}/temp`)
         .then(json => {
           device.temperature = json.temperature;
-          console.log('array from devicesMap', Array.from(this.devicesMap));
           let devices = [];
           this.devicesMap.forEach(device => devices.push(device));
           this.setState({devices});

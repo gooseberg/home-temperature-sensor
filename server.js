@@ -33,7 +33,8 @@ app.post('/api', (req, res) => {
 
 const devices = new Map([
 	[process.env.DEVICE_0_NAME, process.env.DEVICE_0_ID], 
-	[process.env.DEVICE_1_NAME, process.env.DEVICE_1_ID]
+	[process.env.DEVICE_1_NAME, process.env.DEVICE_1_ID],
+	[process.env.DEVICE_2_NAME, process.env.DEVICE_2_ID]
 ]);
 
 const particleRequest = (params, options) => {
@@ -41,7 +42,6 @@ const particleRequest = (params, options) => {
 	let func = particleRequestLookup[params.action] || null;
 	let baseOptions = { auth: token, deviceId: params.id, name: params.name};
 	let finalOptions = Object.assign({}, baseOptions, options);
-	console.log('final options', finalOptions);
 	return func(finalOptions);
 };
 const devicePromises = (devices, promisesCallback) => {
@@ -69,7 +69,6 @@ app.get('/device/:id/temp', (req, res) => {
 	let id = req.params.id
 	particleRequest({id, name: 'temp', action: 'getVariable'})
 		.then(json => {
-			console.log(json.body.result);
 			res.json({temperature: json.body.result})
 		}).catch(err => {
 			res.json({
