@@ -18,12 +18,10 @@ class Devices extends Component {
     super(props);
     this.state = {devices: []};
     this.devicesMap = new Map();
-    this.getDevices()
-        .then(json => {
-          this.setState({devices: json.data});
-          json.data.forEach(device => this.devicesMap.set(device.id, device));
-          this.getTemps();
-        });
+    this.updateData();
+    setInterval(() => {
+      this.updateData();
+    }, 10000)
   }
   render() {
     return (
@@ -53,6 +51,14 @@ class Devices extends Component {
   }
   getDevices() {
     return this.getRequest('/devices/');
+  }
+  updateData() {
+    this.getDevices()
+    .then(json => {
+      this.setState({devices: json.data});
+      json.data.forEach(device => this.devicesMap.set(device.id, device));
+      this.getTemps();
+    });
   }
   async getRequest(reqUrl, params = {}, base = window.location) {
     let url = new URL(reqUrl, base);
