@@ -66,8 +66,11 @@ const tempPromises = (devices) => {
 	return promises;
 }
 app.get('/device/:id/temp', (req, res) => {
-	// do stuff
+	let deviceID = req.params.id
+	// particle.getVariable({name: temp})
+	res.json({temperature: Math.random()*10000})
 });
+
 app.get('/devices/', (req, res) => {
 	let promises = devicePromises(devices, devicesPromises);
 	Promise.all(promises).then((values) => {
@@ -92,10 +95,6 @@ class Device {
 		this.functions = particleDevice.functions;
 		this.variables = particleDevice.variables;
 		this.id = particleDevice.id;
-	}
-}
-class Response {
-	constructor() {
 	}
 }
 const handleParticleResp = (resp, type, res) => {
