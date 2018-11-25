@@ -66,9 +66,16 @@ const tempPromises = (devices) => {
 	return promises;
 }
 app.get('/device/:id/temp', (req, res) => {
-	let deviceID = req.params.id
-	// particle.getVariable({name: temp})
-	res.json({temperature: Math.random()*10000})
+	let id = req.params.id
+	particleRequest({id, name: 'temp', action: 'getVariable'})
+		.then(json => {
+			console.log(json.body.result);
+			res.json({temperature: json.body.result})
+		}).catch(err => {
+			res.json({
+				temperature: null,
+			})
+		})
 });
 
 app.get('/devices/', (req, res) => {

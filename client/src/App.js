@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import { throws } from 'assert';
-const convertTemp = (temp) => {
-  return temp/1000;
+const formatTemp = (temp) => {
+  return temp ? `${temp/1000} °C` : null;
 }
 const DeviceCard = (props, key) => {
   return (
@@ -10,7 +10,7 @@ const DeviceCard = (props, key) => {
       <h3>{props.name}</h3>
       <p>Status {props.status}</p>
       <p>Connected? {props.connected ? 'yes' : false}</p>
-      <p>Temperature: {convertTemp(props.temperature) || 'Loading...'}</p>
+      <p>Temperature: {formatTemp(props.temperature)|| 'Attempting to load device data...'}</p>
     </div>
   );
 }
