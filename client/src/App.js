@@ -1,8 +1,28 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-
+const DeviceCard = (props, key) => {
+  return (
+    <div key={key}>
+      <h3>{props.name}</h3>
+      <p>Status {props.status}</p>
+      <p>Connected? {props.connected ? 'yes' : false}</p>
+    </div>
+  );
+}
 class App extends Component {
+  constructor(props){
+    super(props);
+      this.getRequest('/devices/')
+          .then(resp => resp
+            .json()
+            .then(json => {
+              console.log(json);
+              this.setState({
+                devices: json.data.map((device, index) => DeviceCard(device, index))
+              })
+            })
+          );
+  }
   postInit(data) {
     return {
       method: 'POST',
@@ -13,27 +33,12 @@ class App extends Component {
       }
     }
   }
-  postRequest(data) {
-    let init = this.postInit(data);
-    const URL = '/api';
-    return fetch(URL, init);
-  }
-  toggleOn = (e) => {
-    console.log('toggling on', this, e);
-    this.postRequest({action: 'callFunction', name: 'led', argument: '1'});
-  }
-  toggleOff = (e) => {
-    console.log('toggling on', this, e);
-    this.postRequest({action: 'callFunction', name:'led', argument: '0'});
-  }
-  getTemp = (e) => {
-    this.postRequest({action: 'getVariable', name: 'temp'})
-      .then((resp) => {
-        resp.json()
-            .then(json => {
-              this.setState({temp: this.convertTemp(json.value)});
-            })
-        });
+  getRequest(reqUrl, params = {}, base = window.location) {
+    let url = new URL(reqUrl, base);
+    let urlSearchParams = new URLSearchParams();
+    Object.keys(params).forEach(key => urlSearchParams.append(key, params[key]));
+    url.search = urlSearchParams.toString();
+    return fetch(url.toString());
   }
   convertTemp(temp) {
     return temp/1000;
@@ -41,10 +46,8 @@ class App extends Component {
   render() {
     return (
       <div>
-        <button onClick={this.toggleOn}> Toggle On </button>
-        <button onClick={this.toggleOff}> Toggle Off </button>
-        <button onClick={this.getTemp}>Get Temp</button>
-        <h1>{this.state ? `${this.state.temp} deg c` : 'No Data'}</h1>
+        <h1>House Devices</h1>
+        {this.state ? this.state.devices : null};
       </div>
     );
   }

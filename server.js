@@ -1,4 +1,3 @@
-const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -8,7 +7,6 @@ require('dotenv').config();
 
 const port = process.env.PORT || 8000;
 var particle = new Particle();
-var token;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -23,37 +21,95 @@ app.listen(port, () => {
 });
 
 app.get('/api', function (req, res) {
-	console.log('recieved get req');
 	res.send('It worked');
 });
 
 app.post('/api', (req, res) => {
-	console.log('recieved post req2', req.body);
 	let action = req.body.action;
 	postRequest(req, particleRequest).then(resp => {
 		handleParticleResp(resp, action, res);
 	});
 });
 
+const devices = new Map([
+	[process.env.DEVICE_0_NAME, process.env.DEVICE_0_ID], 
+	[process.env.DEVICE_1_NAME, process.env.DEVICE_1_ID]
+]);
+
+const particleRequest = (params, options) => {
+	let token = process.env.PARTICLE_TOKEN;
+	let func = particleRequestLookup[params.action] || null;
+	let baseOptions = { auth: token, deviceId: params.id, name: params.name};
+	let finalOptions = Object.assign({}, baseOptions, options);
+	console.log('final options', finalOptions);
+	return func(finalOptions);
+};
+const devicePromises = (devices, promisesCallback) => {
+	return promisesCallback(devices);
+}
+const devicesPromises = (devices) => {
+	let promises = [];
+	devices.forEach((device) => {
+		let params = {action: 'getDevice', id: device};
+		let promise = particleRequest(params);
+		promises.push(promise);
+	});
+	return promises;
+}
+const tempPromises = (devices) => {
+	let promises = [];
+	devices.forEach((device) => {
+		let params = {action: 'getVariable', id: device, name: 'temp'};
+		let promise = particleRequest(params);
+		promises.push(promise);
+	});
+	return promises;
+}
+app.get('/device/:id/temp', (req, res) => {
+	// do stuff
+});
+app.get('/devices/', (req, res) => {
+	let promises = devicePromises(devices, devicesPromises);
+	Promise.all(promises).then((values) => {
+		let data = values.map(deviceBody => new Device(deviceBody.body));
+		let response = {
+			data,
+			success: true
+		}
+		res.send(JSON.stringify(response));
+	}).catch(error => {
+		res.status(400);
+		res.send({message: 'Unauthorized API call', error, success: false});
+		console.error(error);
+	});
+});
+
+class Device {
+	constructor(particleDevice) {
+		this.name = particleDevice.name;
+		this.connected = particleDevice.connected;
+		this.status = particleDevice.status;
+		this.functions = particleDevice.functions;
+		this.variables = particleDevice.variables;
+		this.id = particleDevice.id;
+	}
+}
+class Response {
+	constructor() {
+	}
+}
 const handleParticleResp = (resp, type, res) => {
-	console.log('resp', resp, type);
 	let out = {value: resp.body.result, success: true};
 	res.send(JSON.stringify(out));
 }
 
-const requestLookup = {
+const particleRequestLookup = {
 	'getVariable': particle.getVariable.bind(particle),
 	'callFunction': particle.callFunction.bind(particle),
+	'getDevice': particle.getDevice.bind(particle),
 }
 
-const particleRequest = (body, options) => {
-	let id = process.env.RAUTEK_1;
-	let token = process.env.PARTICLE_TOKEN;
-	let func = requestLookup[body.action] || null;
-	let baseOptions = { auth: token, deviceId: id, name: body.name };
-	let finalOptions = Object.assign({}, options, baseOptions);
-	return func(finalOptions);
-};
+
 
 const postRequest = (req, callback, options = {}) => {
 	let body = req.body;
